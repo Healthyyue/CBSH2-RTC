@@ -2,7 +2,7 @@
 #include <iostream>
 #include "common.h"
 
-
+//  打印节点方法，两重循环遍历的打印出每一层中每一个节点
 void MDD::printNodes() const
 {
 	for (const auto& level : levels)
@@ -35,28 +35,29 @@ void MDD::printNodes() const
 
 bool MDD::buildMDD(const ConstraintTable& ct, int num_of_levels, const SingleAgentSolver* _solver)
 {
-  this->solver = _solver;
+  this->solver = _solver;  //MDD 中的单车寻路算法对象，
   auto root = new MDDNode(solver->start_location, nullptr); // Root
   root->cost = num_of_levels - 1;
-	std::queue<MDDNode*> open;
-	list<MDDNode*> closed;
-	open.push(root);
-	closed.push_back(root);
-	levels.resize(num_of_levels);
-	while (!open.empty())
+	std::queue<MDDNode*> open;  //队列
+	list<MDDNode*> closed;   // 列表
+	open.push(root);  //    队列的后面添加新的元素
+	closed.push_back(root); // 列表的后面添加新的元素
+	levels.resize(num_of_levels);   //将levels重置为和level的数量一致
+	while (!open.empty())   // open 非空的时候
 	{
-		auto curr = open.front();
+		auto curr = open.front();   //使得 curr等于open这个队列中最老的那个元素，如果每次都是添加到后面的话，这将是队列最前端的元素。注意的是，这里是那个元素的引用
 		open.pop();
 		// Here we suppose all edge cost equals 1
-		if (curr->level == num_of_levels - 1)
+		if (curr->level == num_of_levels - 1)  // 当curr到达mdd中最后一个层次时，也就是curr等于目的地的时候？
 		{
-			levels.back().push_back(curr);
-			assert(open.empty());
+			levels.back().push_back(curr);   // 将 curr 添加到levels中最后一个nodes_list里面的后面
+			assert(open.empty());   // 如果此时open为空则终止程序
 			break;
 		}
 		// We want (g + 1)+h <= f = numOfLevels - 1, so h <= numOfLevels - g - 2. -1 because it's the bound of the children.
-		int heuristicBound = num_of_levels - curr->level - 2;
-		list<int> next_locations = solver->getNextLocations(curr->location);
+        // g指的是当前位置的level，也就是距离起点的最小cost
+		int heuristicBound = num_of_levels - curr->level - 2;   // 这里的启发值边界还不明确是什么意思？
+		list<int> next_locations = solver->getNextLocations(curr->location);  // 生成当前节点在mdd中可能到达的所有节点组成的列表，但为什么会是int类型呢？
 		for (int next_location : next_locations) // Try every possible move. We only add backward edges in this step.
 		{
 			if (solver->my_heuristic[next_location] <= heuristicBound &&

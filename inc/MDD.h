@@ -17,7 +17,7 @@ public:
 			parents.push_back(parent);
 		}
 	}
-	int location;
+	int location;   // location为什么是整型呢？
 	int level;
 	int cost=0; // minimum cost of path traversing this MDD node
 
@@ -37,7 +37,7 @@ private:
 	const SingleAgentSolver* solver;
 
 public:
-	vector<list<MDDNode*>> levels;
+	vector<list<MDDNode*>> levels;  // levels 是一个包含所有 MDDNODE 指针的向量，它里面是一个又一个的level对象（list<MDDNode*>），而level对象里面是一个又一个node对象（均为指针）
 
 	bool buildMDD(const ConstraintTable& ct,
 				  int num_of_levels, const SingleAgentSolver* solver);
