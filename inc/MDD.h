@@ -2,7 +2,7 @@
 
 #include "SingleAgentSolver.h"
 
-
+//开干！！加油！！！！勇敢的面对它！
 class MDDNode
 {
 public:
