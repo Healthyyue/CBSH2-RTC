@@ -34,12 +34,12 @@ void SingleAgentSolver::compute_heuristics()
 	// generate a heap that can save nodes (and a open_handle)
 	boost::heap::pairing_heap<Node, boost::heap::compare<Node::compare_node> > heap;
 
-	Node root(goal_location, 0);
-	my_heuristic[goal_location] = 0;
+	Node root(goal_location, 0);  //这里的root是终点
+	my_heuristic[goal_location] = 0;  // 终点对应的启发值是0
 	heap.push(root);  // add root to heap
 	while (!heap.empty())
 	{
-		Node curr = heap.top();
+		Node curr = heap.top();    //  curr是heap中最上面的元素，也就是f值最小，g值最大的元素
 		heap.pop();
 		for (int next_location : instance.getNeighbors(curr.location))
 		{

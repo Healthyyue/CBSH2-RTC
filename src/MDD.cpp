@@ -55,8 +55,9 @@ bool MDD::buildMDD(const ConstraintTable& ct, int num_of_levels, const SingleAge
 			break;
 		}
 		// We want (g + 1)+h <= f = numOfLevels - 1, so h <= numOfLevels - g - 2. -1 because it's the bound of the children.
-        // g指的是当前位置的level，也就是距离起点的最小cost
-		int heuristicBound = num_of_levels - curr->level - 2;   // 这里的启发值边界还不明确是什么意思？
+        // g指的是当前位置的level，也就是距离起点的最小cost， h 是当前位置到终点的最小cost。也就是这里的my_heuristic
+        // 针对没有障碍物的地图环境下，MDD的构建已经理解了，下面是针对有障碍物的环境以及mdd如何使用？也就是mutex传播的用法
+		int heuristicBound = num_of_levels - curr->level - 2;
 		list<int> next_locations = solver->getNextLocations(curr->location);  // 生成当前节点在mdd中可能到达的所有节点组成的列表，但为什么会是int类型呢？
 		for (int next_location : next_locations) // Try every possible move. We only add backward edges in this step.
 		{
@@ -64,9 +65,9 @@ bool MDD::buildMDD(const ConstraintTable& ct, int num_of_levels, const SingleAge
 				!ct.constrained(next_location, curr->level + 1) &&
 				!ct.constrained(curr->location, next_location, curr->level + 1)) // valid move
 			{
-				auto child = closed.rbegin();
+				auto child = closed.rbegin();   // 将close中最后一个mdd_node命名为child
 				bool find = false;
-				for (; child != closed.rend() && ((*child)->level == curr->level + 1); ++child)
+				for (; child != closed.rend() && ((*child)->level == curr->level + 1); ++child) //   对close中的node逆序遍历循环
 				{
 					if ((*child)->location == next_location) // If the child node exists
 					{
