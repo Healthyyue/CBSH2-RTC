@@ -151,6 +151,7 @@ void CBS::findConflicts(CBSNode& curr)
 	}
 	else
 	{
+        // 将所有小车两两组合，检查现有路径是否有碰撞
 		for (int a1 = 0; a1 < num_of_agents; a1++)
 		{
 			for (int a2 = a1 + 1; a2 < num_of_agents; a2++)
@@ -160,6 +161,7 @@ void CBS::findConflicts(CBSNode& curr)
 		}
 	}
 	// curr.tie_breaking = (int)(curr.unknownConf.size() + curr.conflicts.size());
+    // 记录runtime以免超时
 	runtime_detect_conflicts += (double) (clock() - t) / CLOCKS_PER_SEC;
 }
 
@@ -211,7 +213,7 @@ void CBS::computePriorityForConflict(Conflict& conflict, const CBSNode& node)
     }*/
 }
 
-
+// 各种CBS的优化技术的入口在这个函数下
 void CBS::classifyConflicts(CBSNode& node)
 {
 	// Classify all conflicts in unknownConf
@@ -312,6 +314,10 @@ void CBS::classifyConflicts(CBSNode& node)
 			}
 		}
 
+        // 所以是先检查出碰撞，在识别出是cardinal的碰撞，就拿过来让mutex识别以下，是不是mutex_conflict，如果是就由mutex给出相应的约束
+        // 再交由SAS去计算路径，得到结果，并更新。
+        // 这里对我而言比较关键的问题有两个：1.那些semi-cardinal，non-cardinal的碰撞们怎么解决的？是不是只通过普通的CBS添加约束进行解决
+        // 2. mutex是怎么解决路径的？我忘记了，是添加约束吗？ 3. 基于第二点 mutex 函数的进出口是什么？在哪里？
 		// Mutex reasoning
 		if (mutex_reasoning)
 		{
@@ -319,6 +325,7 @@ void CBS::classifyConflicts(CBSNode& node)
 			auto mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
 			auto mdd2 = mdd_helper.getMDD(node, a2, paths[a2]->size());
 
+            // mutex 程序的入口。
 			auto mutex_conflict = mutex_helper.run(paths, a1, a2, node, mdd1, mdd2);
 
 			if (mutex_conflict != nullptr && (*mutex_conflict != *con)) // ignore the cases when mutex finds the same vertex constraints
@@ -1093,6 +1100,7 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 							   ConstraintTable(instance.num_of_cols, instance.map_size));
 
 	search_engines.resize(num_of_agents);
+    // 针对所有小车遍历的循环，利用SAS算出每个小车的一条路径
 	for (int i = 0; i < num_of_agents; i++)
 	{
 		if (sipp)
