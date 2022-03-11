@@ -1086,6 +1086,8 @@ CBS::CBS(vector<SingleAgentSolver*>& search_engines,
 	mutex_helper.search_engines = search_engines;
 }
 
+// 这里在做的工作应该是在给予CBS及各个组件赋予地图信息，起点终点信息，小车数量等MAPF的基本信息。
+// 问题是：就mutex而言，好像并没有用到以上的信息，但仍然给予了这些？ 我的算法也好像用不上这些信息，我是否要赋予呢？
 CBS::CBS(const Instance& instance, bool sipp, int screen) :
 		screen(screen), focal_w(1),
 		num_of_agents(instance.getDefaultNumberOfAgents()),
@@ -1099,6 +1101,8 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 	initial_constraints.resize(num_of_agents,
 							   ConstraintTable(instance.num_of_cols, instance.map_size));
 
+    // 这里将search engines 重置为了与小车数量一致的长度
+    // 也就是说每一个小车都有一个独立的单车寻路对象，这很合理
 	search_engines.resize(num_of_agents);
     // 针对所有小车遍历的循环，利用SAS算出每个小车的一条路径
 	for (int i = 0; i < num_of_agents; i++)
@@ -1112,8 +1116,9 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 	}
 	runtime_preprocessing = (double) (clock() - t) / CLOCKS_PER_SEC;
 
+    // used to find (single) agents' paths and mdd
+    // 这一步的实际意义是将每个小车的独立路径和MDD给到mutex
 	mutex_helper.search_engines = search_engines;
-
 	if (screen >= 2) // print start and goals
 	{
 		instance.printAgents();

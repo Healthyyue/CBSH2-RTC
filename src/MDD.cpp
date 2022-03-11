@@ -278,6 +278,7 @@ MDD::~MDD()
 	clear();
 }
 
+// 这里应该是在扩张MDD，以便于找到答案
 void MDD::increaseBy(const ConstraintTable&ct, int dLevel, SingleAgentSolver* _solver) //TODO:: seems that we do not need solver
 {
 	auto oldHeight = levels.size();

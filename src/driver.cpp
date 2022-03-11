@@ -133,7 +133,7 @@ int main(int argc, char** argv)
 	//////////////////////////////////////////////////////////////////////
 	/// initialize the solver
     //////////////////////////////////////////////////////////////////////
-	CBS cbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>());
+	CBS cbs(instance, vm["sipp"].as<bool>(), vm["screen"].as<int>()); // 要解决MAPF问题所需要的基本信息
 	cbs.setPrioritizeConflicts(vm["prioritizingConflicts"].as<bool>());
 	cbs.setDisjointSplitting(vm["disjointSplitting"].as<bool>());
 	cbs.setBypass(vm["bypass"].as<bool>());

@@ -335,6 +335,7 @@ int ConstraintPropagation::_feasible(int level_0, int level_1){
     std::cout << "ERROR!" << std::endl;
   }
 
+  // 两个MDD中，相对短的那个的终点，赋予定义。这里值得注意的是level_0也就是size(levels)-1，是最后一层。
   auto goal_ptr_i = mdd_s->goalAt(level_0);
 
   std::stack<MDDNode*> dfs_stack;
